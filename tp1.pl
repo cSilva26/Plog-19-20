@@ -22,6 +22,37 @@ sample4(board(Red,Blue)):-
 piece(white, X, Y)  :- position(X, Y).
 piece(black, X, Y) :- position(X, Y).
 
+board_tile(black,0,0).
+board_tile(white,0,1).
+board_tile(black,0,2).
+board_tile(white,0,3).
+board_tile(black,0,4).
+board_tile(white,1,0).
+board_tile(black,1,1).
+board_tile(white,1,2).
+board_tile(black,1,3).
+board_tile(white,1,4).
+board_tile(black,2,0).
+board_tile(white,2,1).
+board_tile(black,2,2).
+board_tile(white,2,3).
+board_tile(black,2,4).
+board_tile(white,3,0).
+board_tile(black,3,1).
+board_tile(white,3,2).
+board_tile(black,3,3).
+board_tile(white,3,4).
+board_tile(black,4,0).
+board_tile(white,4,1).
+board_tile(black,4,2).
+board_tile(white,4,3).
+board_tile(black,4,4).
+
+player(red).
+player(blue).
+other_player(red, blue).
+other_player(blue, red).
+
 coordinate(X) :- list_member([0, 1, 2, 3, 4], X).
 
 /* Any valid cell on the board.*/
@@ -75,7 +106,17 @@ print_board(Board) :-
     write('    0    1    2    3    4   \n'), !.
 
 
+/*User Input ------------------------------------------------------------------*/
+player_select_side(Side) :-
+    write('Select your side (red/blue): '),
+    read(UserSide),
+    (
+        (player(UserSide), Side = UserSide, !);
+        (write('Invalid side, please type \'red.\' or \'blue.\'\n'), player_select_side(Side))
+    ).
+
 draw:-
-	/*initial_board(B),*/
-  sample2(B), 
+	initial_board(B),
+  /*sample2(B), */
+  player_select_side(Side),
 	print_board(B).
