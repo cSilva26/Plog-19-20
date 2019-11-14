@@ -1,3 +1,5 @@
+:-use_module(library(between)).
+
 initial_board(board(Red, Blue)):-
 		Red = [piece(white, 0, 0), piece(black, 1, 0), piece(white, 2, 0), 
 				piece(black, 3, 0), piece(white, 4, 0)],
@@ -18,7 +20,6 @@ sample4(board(Red,Blue)):-
     Red = [],
     Blue = [piece(white, 1, 2), piece(black, 2, 4), piece(white, 3, 1)].
 
-/*---------------------------------------------------------------------------------------------*/
 piece(white, X, Y)  :- position(X, Y).
 piece(black, X, Y) :- position(X, Y).
 
@@ -65,7 +66,12 @@ position(X, Y) :-
 /*---------------------------------------------------------------------------------------------*/
 list_member(List, Member):- member(Member, List).
 list_absent(List, Element):- \+ (member(Element, List)).
+delete_from_list(List, Element, NewList):- select(Element, List, NewList).
+append_list(List1, List2, Result):- append(List1, List2, Result).
 
+/*predicates to list the members of the board depending on the side of the player*/
+listBoards(blue, board(Red, Blue), Blue, Red).
+listBoards(red, board(Red, Blue), Red, Blue).
 /*----------------------------------------------------------------------------------------------------*/
 /*Print any symbol inside cell. Also prints separator & vertical cells numbering.*/
 print_cell_symbol(X, Y, Symbol) :- X  = 4, write(' | '), write(Symbol), write(' | '), write(Y),
@@ -105,8 +111,30 @@ print_board(Board) :-
     print_board_internal(Board, 24),
     write('    0    1    2    3    4   \n'), !.
 
+/*Movements ------------------------------------------------------------------*/
+move(Side, board(Red, Blue), board(NewRed, NewBlue)) :-
+    move_figure(Side, board(Red, Blue), board(NewRed, NewBlue)).
+
+/*predicado que acede à lista de pecas remove a peca escolhida do sitio prévio */
+/*  e adiciona uma nova com a nova posicao escolhida*/
+move_figure(Side, ListPlayer, ListOpponent, NewListPlayer):-
+
+move_figure(red, board(Red, Blue), board(NewRed, Blue)) :-
+    move_figure(red, Red, Blue, NewRed).
+move_figure(blue, board(Red, Blue), board(Red, NewBlue)) :-
+    move_figure(blue, Blue, Red, NewBlue).
+
+possible_move(red,piece(ColorPiece,X,Y), piece(_,X2,Y2))):-
+  board_tile(ColorBoard, X, Y),
+
+
+inside_board(X/Y):-
+      between(0,4,X),
+      between(0,4,Y).
 
 /*User Input ------------------------------------------------------------------*/
+
+/*predicate to request player to choose a side*/
 player_select_side(Side) :-
     write('Select your side (red/blue): '),
     read(UserSide),
@@ -114,6 +142,30 @@ player_select_side(Side) :-
         (player(UserSide), Side = UserSide, !);
         (write('Invalid side, please type \'red.\' or \'blue.\'\n'), player_select_side(Side))
     ).
+
+/*predicate to request player to input a movement*/
+player_input_move(Side, board(Red, Blue), NewBoard):- 
+    write('Choose piece to move: (X-Y)'),
+    player_input_pos(position(X1, Y1)), 
+    write('Choose where to move: (X-Y)')
+    player_input_pos(position(X2, Y2)),
+    listBoards(Side, board(Red, Blue), ListCurrentPlayerMoves, ListNoMoves),
+    (
+      (delete_from_list(ListCurrentPlayerMoves, position(X1,Y1), ListCurrentPlayerMOvesTemp),
+       append_list(ListCurrentPlayerMovesTemp, position(X2, Y2), NewListCurrentPLayerMoves), 
+       listBoards(Side, NewBoard, NewListCurrentPLayerMoves, ListNoMoves),
+       move(Side, board(Red, Blue), NewBoard)
+        ); 
+      write('That move is not valid. Try again: (X-Y)'), player_input_move(Side, board(Red, Blue), NewBoard)
+    ),!.
+/*------------------------------------------------------------------------------*/
+game(Side, Board1):-
+        otherSide(Side, otherSide),
+        print_board(Board1),
+        /*avaliacao_estado(),*/
+        player_input_move(Side, Board1, Board2),
+
+
 
 draw:-
 	initial_board(B),
