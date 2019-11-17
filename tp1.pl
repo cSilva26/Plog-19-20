@@ -129,7 +129,9 @@ print_board(Board) :-
     write('    0    1    2    3    4   \n'), !.
 
 /*Movements ------------------------------------------------------------------*/
-/*Movements ------------------------------------------------------------------*/
+can_move(Side, Board) :- move(Side, Board, _), !.
+can_move(Side, _) :- other_player(Side, OtherSide), write('\n'), write(OtherSide), write(' wins!\n'), !, fail.
+
 move(Side, board(Red, Blue), board(NewRed, NewBlue)) :-
     move_figure(Side, board(Red, Blue), board(NewRed, NewBlue)).
 
@@ -336,11 +338,11 @@ player_input_move(Side, board(Red, Blue), NewBoard):-
 game(Side, Board1):-
         other_player(Side, OtherSide),
         print_board(Board1),
-        /*avaliacao_estado(Side, Board1),*/
+        can_move(OtherSide, Board1),
         player_input_move(Side, Board1, Board2),
         write('\n'), write(Side), write(' moving:\n'),
         print_board(Board2),
-        /*can_move(OtherSide, Board2),*/
+        can_move(OtherSide, Board2),
         smart_move(OtherSide, Board2, Board3),
         write('\n'), write(OtherSide), write(' moving:\n'),
         game(Side, Board3).
