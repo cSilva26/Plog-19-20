@@ -137,17 +137,17 @@ move(Side, board(Red, Blue), board(NewRed, NewBlue)) :-
 
 /*predicado que acede à lista de pecas remove a peca escolhida do sitio prévio */
 /*  e adiciona uma nova com a nova posicao escolhida*/
-move_figure(Side, ListPlayer, ListOpponent, NewListPlayer):-
+move_figure(Side, ListPlayer, ListOpponent, NewListPlayer, NewListOpponent):-
             delete_from_list(ListPlayer, InitialPosition, TmpListPlayer),
             possible_move(Side, InitialPosition, FinalPosition),
             way_is_free(Side, ListPlayer, ListOpponent, FinalPosition, NewListOpponent),
             append_list(TmpListPlayer, [FinalPosition], NewListPlayer).
 
 
-move_figure(red, board(Red, Blue), board(NewRed, Blue)) :-
-    move_figure(red, Red, Blue, NewRed).
-move_figure(blue, board(Red, Blue), board(Red, NewBlue)) :-
-    move_figure(blue, Blue, Red, NewBlue).
+move_figure(red, board(Red, Blue), board(NewRed, NewBlue)) :-
+    move_figure(red, Red, Blue, NewRed, NewBlue).
+move_figure(blue, board(Red, Blue), board(NewRed, NewBlue)) :-
+    move_figure(blue, Blue, Red, NewBlue, NewRed).
 
 possible_move(red,piece(ColorPiece,X,Y), piece(_,X2,Y2)):-
   board_tile(ColorBoard, X, Y),
